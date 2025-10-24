@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/app_constants.dart';
+import '../providers/locale_provider.dart';
+import 'language_settings_page.dart';
 
 /// 我的页面
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(stringsProvider);
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
       appBar: AppBar(
-        title: const Text('我的'),
+        title: Text(strings.profileTitle),
         backgroundColor: AppConstants.cardBackgroundColor,
         elevation: 0,
         leading: IconButton(
@@ -63,7 +67,7 @@ class ProfilePage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '用户名',
+                          strings.profileUsername,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -72,7 +76,7 @@ class ProfilePage extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '记账 0 天',
+                          strings.profileDays,
                           style: TextStyle(
                             fontSize: 14,
                             color: AppConstants.textSecondaryColor,
@@ -99,125 +103,128 @@ class ProfilePage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // 数据导入
-            _SectionTitle(title: '数据管理'),
+            _SectionTitle(title: strings.profileDataManagement),
             _MenuItem(
               icon: Icons.upload_file,
-              title: '微信账单导入',
-              subtitle: '导入微信账单数据',
+              title: strings.profileWechatImport,
+              subtitle: strings.profileWechatImportDesc,
               onTap: () {
-                // TODO: 实现微信账单导入
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('微信账单导入功能开发中...')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                );
               },
             ),
             _MenuItem(
               icon: Icons.account_balance,
-              title: '支付宝账单导入',
-              subtitle: '导入支付宝账单数据',
+              title: strings.profileAlipayImport,
+              subtitle: strings.profileAlipayImportDesc,
               onTap: () {
-                // TODO: 实现支付宝账单导入
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('支付宝账单导入功能开发中...')),
+                  SnackBar(content: Text(strings.profileDevelopingHint)),
                 );
               },
             ),
             _MenuItem(
               icon: Icons.backup,
-              title: '数据备份',
-              subtitle: '备份本地数据',
+              title: strings.profileDataBackup,
+              subtitle: strings.profileDataBackupDesc,
               onTap: () {
-                // TODO: 实现数据备份
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('数据备份功能开发中...')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                );
               },
             ),
             _MenuItem(
               icon: Icons.restore,
-              title: '数据恢复',
-              subtitle: '从备份恢复数据',
+              title: strings.profileDataRestore,
+              subtitle: strings.profileDataRestoreDesc,
               onTap: () {
-                // TODO: 实现数据恢复
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('数据恢复功能开发中...')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                );
               },
             ),
 
             const SizedBox(height: 24),
 
             // 设置
-            _SectionTitle(title: '设置'),
+            _SectionTitle(title: strings.profileSettings),
             _MenuItem(
               icon: Icons.category,
-              title: '分类管理',
-              subtitle: '自定义收支分类',
+              title: strings.profileCategoryManagement,
+              subtitle: strings.profileCategoryManagementDesc,
               onTap: () {
-                // TODO: 分类管理
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('分类管理功能开发中...')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                );
               },
             ),
             _MenuItem(
               icon: Icons.notifications,
-              title: '记账提醒',
-              subtitle: '设置每日记账提醒',
+              title: strings.profileReminder,
+              subtitle: strings.profileReminderDesc,
               onTap: () {
-                // TODO: 记账提醒设置
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('记账提醒功能开发中...')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                );
               },
             ),
             _MenuItem(
               icon: Icons.lock,
-              title: '隐私设置',
-              subtitle: '密码锁、指纹锁',
+              title: strings.profilePrivacy,
+              subtitle: strings.profilePrivacyDesc,
               onTap: () {
-                // TODO: 隐私设置
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('隐私设置功能开发中...')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                );
               },
             ),
             _MenuItem(
               icon: Icons.palette,
-              title: '主题设置',
-              subtitle: '切换应用主题',
+              title: strings.profileTheme,
+              subtitle: strings.profileThemeDesc,
               onTap: () {
-                // TODO: 主题设置
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('主题设置功能开发中...')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                );
+              },
+            ),
+            _MenuItem(
+              icon: Icons.language,
+              title: strings.profileLanguage,
+              subtitle: strings.profileLanguageDesc,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const LanguageSettingsPage(),
+                  ),
+                );
               },
             ),
 
             const SizedBox(height: 24),
 
             // 关于
-            _SectionTitle(title: '关于'),
+            _SectionTitle(title: strings.profileAbout),
             _MenuItem(
               icon: Icons.info,
-              title: '关于我们',
+              title: strings.profileAboutUs,
               onTap: () {
                 showAboutDialog(
                   context: context,
-                  applicationName: AppConstants.appName,
+                  applicationName: strings.appName,
                   applicationVersion: '1.0.0',
-                  applicationLegalese: '© 2024 小步记账\n一个简单易用的记账工具',
+                  applicationLegalese: strings.profileAboutContent,
                 );
               },
             ),
             _MenuItem(
               icon: Icons.help,
-              title: '帮助与反馈',
+              title: strings.profileHelpFeedback,
               onTap: () {
-                // TODO: 帮助与反馈
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('帮助与反馈功能开发中...')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                );
               },
             ),
 

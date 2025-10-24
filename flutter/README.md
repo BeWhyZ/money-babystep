@@ -1,4 +1,4 @@
-# 小步记账 - Flutter UI框架
+# 记账 - Flutter UI框架
 
 一个基于Flutter + Riverpod + SQLite的个人记账应用。
 

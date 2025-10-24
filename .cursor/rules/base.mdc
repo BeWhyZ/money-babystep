@@ -10,7 +10,7 @@ alwaysApply: true
 个人财务状况。
 
 # 项目架构
-1. 本项目使用flutter来作为移动端ui的实现，使用rust来作为具体的业务逻辑实现，其中将flutter与rust进行通信，使用flutter_rust_bridge来实现。
+1. 本项目使用flutter来作为移动端ui的实现，使用rust来作为具体的业务逻辑实现，其中将flutter与rust进行通信，使用rinf(rust in flutter)来实现。
 
 # 项目要求
 1. 能够以flutter来实现app的UI设计
@@ -98,8 +98,6 @@ rustdesk/
             └── AppDelegate.swift       # 应用代理
 ```
 Riverpod: 用于状态管理
-FfiModel: 核心数据模型，连接 Rust 层的数据
-StreamSink: 用于接收 Rust 层的事件流
 
 
 # 项目ai命令提示

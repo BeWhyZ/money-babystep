@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// 应用常量定义
 class AppConstants {
   // 应用名称
-  static const String appName = '小步记账';
+  static const String appName = '记账';
 
   // 颜色主题 - 类微信风格
   static const Color primaryColor = Color(0xFF07C160); // 微信绿

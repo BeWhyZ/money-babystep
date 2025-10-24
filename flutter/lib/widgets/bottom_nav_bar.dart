@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/app_constants.dart';
 import '../providers/navigation_provider.dart';
+import '../providers/locale_provider.dart';
 
 /// 底部导航栏组件
 class BottomNavBar extends ConsumerWidget {
@@ -12,6 +13,7 @@ class BottomNavBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(navigationIndexProvider);
+    final strings = ref.watch(stringsProvider);
 
     return Container(
       decoration: BoxDecoration(
@@ -34,7 +36,7 @@ class BottomNavBar extends ConsumerWidget {
               Expanded(
                 child: _NavButton(
                   icon: Icons.book_outlined,
-                  label: '记账',
+                  label: strings.navBookkeeping,
                   isSelected: currentIndex == 0,
                   onTap: () {
                     ref.read(navigationIndexProvider.notifier).state = 0;
@@ -46,7 +48,7 @@ class BottomNavBar extends ConsumerWidget {
               Expanded(
                 child: _NavButton(
                   icon: Icons.account_balance_wallet_outlined,
-                  label: '资产',
+                  label: strings.navAsset,
                   isSelected: currentIndex == 1,
                   onTap: () {
                     ref.read(navigationIndexProvider.notifier).state = 1;

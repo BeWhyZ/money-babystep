@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/app_constants.dart';
+import '../providers/locale_provider.dart';
 
 /// 顶部固定栏组件
-class TopBar extends StatelessWidget implements PreferredSizeWidget {
+class TopBar extends ConsumerWidget implements PreferredSizeWidget {
   final VoidCallback? onProfileTap;
 
   const TopBar({super.key, this.onProfileTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(stringsProvider);
     return Container(
       color: AppConstants.cardBackgroundColor,
       child: SafeArea(
@@ -42,7 +45,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '我的',
+                        strings.navProfile,
                         style: TextStyle(
                           fontSize: 14,
                           color: AppConstants.textPrimaryColor,
@@ -55,7 +58,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
 
               // 中间APP名称
               Text(
-                AppConstants.appName,
+                strings.appName,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
