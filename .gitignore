@@ -28,20 +28,20 @@
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
-/flutter/.dart_tool/
-/flutter/.flutter-plugins-dependencies
-/flutter/.pub-cache/
-/flutter/.pub/
-/flutter/build/
-/flutter/coverage/
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+coverage/
 
 # Symbolication related
-/flutter/app.*.symbols
+app.*.symbols
 
 # Obfuscation related
-/flutter/app.*.map.json
+app.*.map.json
 
 # Android Studio will place build artifacts here
-/flutter/android/app/debug
-/flutter/android/app/profile
-/flutter/android/app/release
+android/app/debug
+android/app/profile
+android/app/release
