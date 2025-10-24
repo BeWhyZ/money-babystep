@@ -1,10 +1,13 @@
+import 'package:rinf/rinf.dart';
+import 'src/bindings/bindings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'constants/app_constants.dart';
 import 'constants/app_strings.dart';
 import 'pages/main_frame_page.dart';
 
-void main() {
+Future<void> main() async {
+  await initializeRust(assignRustSignal);
   runApp(const ProviderScope(child: MyApp()));
 }
 
