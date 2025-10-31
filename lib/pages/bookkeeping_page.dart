@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../constants/app_constants.dart';
+import '../constants/app_strings.dart';
 import '../models/transaction.dart';
 import '../providers/transaction_provider.dart';
+import '../providers/locale_provider.dart';
 
 /// 记账页面
 class BookkeepingPage extends ConsumerWidget {
@@ -11,6 +13,7 @@ class BookkeepingPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final language = ref.watch(localeProvider);
     final monthlyIncome = ref.watch(monthlyIncomeProvider);
     final monthlyExpense = ref.watch(monthlyExpenseProvider);
     final monthlyBalance = ref.watch(monthlyBalanceProvider);
@@ -45,7 +48,7 @@ class BookkeepingPage extends ConsumerWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          '暂无记账记录',
+                          AppStrings.bookkeepingNoData.tr(language),
                           style: TextStyle(
                             fontSize: 16,
                             color: AppConstants.textSecondaryColor,
@@ -53,7 +56,7 @@ class BookkeepingPage extends ConsumerWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '点击右下角"+"开始记账',
+                          AppStrings.bookkeepingNoDataHint.tr(language),
                           style: TextStyle(
                             fontSize: 14,
                             color: AppConstants.textSecondaryColor,
@@ -67,7 +70,16 @@ class BookkeepingPage extends ConsumerWidget {
                 return _TransactionList(transactions: transactions);
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(child: Text('加载失败: $error')),
+              error: (error, stack) => Center(
+                child: Consumer(
+                  builder: (context, ref, _) {
+                    final language = ref.watch(localeProvider);
+                    return Text(
+                      '${AppStrings.commonError.tr(language)}: $error',
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         ],
@@ -77,7 +89,7 @@ class BookkeepingPage extends ConsumerWidget {
 }
 
 /// 收支总览卡片
-class _SummaryCard extends StatelessWidget {
+class _SummaryCard extends ConsumerWidget {
   final double income;
   final double expense;
   final double balance;
@@ -89,7 +101,8 @@ class _SummaryCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final language = ref.watch(localeProvider);
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
@@ -120,7 +133,7 @@ class _SummaryCard extends StatelessWidget {
           Column(
             children: [
               Text(
-                '结余',
+                AppStrings.bookkeepingBalance.tr(language),
                 style: TextStyle(
                   fontSize: 14,
                   color: AppConstants.textSecondaryColor,
@@ -149,7 +162,7 @@ class _SummaryCard extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      '收入',
+                      AppStrings.bookkeepingIncome.tr(language),
                       style: TextStyle(
                         fontSize: 14,
                         color: AppConstants.textSecondaryColor,
@@ -172,7 +185,7 @@ class _SummaryCard extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      '支出',
+                      AppStrings.bookkeepingExpense.tr(language),
                       style: TextStyle(
                         fontSize: 14,
                         color: AppConstants.textSecondaryColor,
@@ -199,13 +212,14 @@ class _SummaryCard extends StatelessWidget {
 }
 
 /// 交易明细列表
-class _TransactionList extends StatelessWidget {
+class _TransactionList extends ConsumerWidget {
   final List<Transaction> transactions;
 
   const _TransactionList({required this.transactions});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final language = ref.watch(localeProvider);
     // 按日期分组
     final groupedTransactions = <String, List<Transaction>>{};
     for (var transaction in transactions) {
@@ -230,7 +244,7 @@ class _TransactionList extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Text(
-                _formatDate(date),
+                _formatDate(date, language),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -249,16 +263,16 @@ class _TransactionList extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(DateTime date, Language language) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
     final transactionDate = DateTime(date.year, date.month, date.day);
 
     if (transactionDate == today) {
-      return '今天';
+      return AppStrings.bookkeepingToday.tr(language);
     } else if (transactionDate == yesterday) {
-      return '昨天';
+      return AppStrings.bookkeepingYesterday.tr(language);
     } else {
       return DateFormat('MM月dd日 EEEE', 'zh_CN').format(date);
     }

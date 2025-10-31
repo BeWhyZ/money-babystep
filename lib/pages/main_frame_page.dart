@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/navigation_provider.dart';
@@ -7,6 +9,7 @@ import '../widgets/transaction_input_sheet.dart';
 import 'bookkeeping_page.dart';
 import 'asset_page.dart';
 import 'profile_page.dart';
+import 'package:rinf/rinf.dart';
 
 /// 主框架页面
 class MainFramePage extends ConsumerStatefulWidget {
@@ -18,16 +21,29 @@ class MainFramePage extends ConsumerStatefulWidget {
 
 class _MainFramePageState extends ConsumerState<MainFramePage> {
   late PageController _pageController;
+  late AppLifecycleListener _listener;
 
   @override
   void initState() {
     super.initState();
+    print('initState');
     _pageController = PageController(initialPage: 0);
+    print('initState success');
+
+    _listener = AppLifecycleListener(onExitRequested: _handleExitRequested);
+  }
+
+  Future<AppExitResponse> _handleExitRequested() async {
+    debugPrint('finalizeRust called');
+    finalizeRust(); // Shut down the async Rust runtime.
+    debugPrint('finalizeRust success');
+    return AppExitResponse.exit;
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _listener.dispose();
     super.dispose();
   }
 

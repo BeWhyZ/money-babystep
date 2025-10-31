@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/app_constants.dart';
+import '../constants/app_strings.dart';
 import '../providers/locale_provider.dart';
 import 'language_settings_page.dart';
 
@@ -10,11 +11,11 @@ class ProfilePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final strings = ref.watch(stringsProvider);
+    final language = ref.watch(localeProvider);
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
       appBar: AppBar(
-        title: Text(strings.profileTitle),
+        title: Text(AppStrings.profileTitle.tr(language)),
         backgroundColor: AppConstants.cardBackgroundColor,
         elevation: 0,
         leading: IconButton(
@@ -67,7 +68,7 @@ class ProfilePage extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          strings.profileUsername,
+                          AppStrings.profileUsername.tr(language),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -76,7 +77,7 @@ class ProfilePage extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          strings.profileDays,
+                          AppStrings.profileDays.tr(language),
                           style: TextStyle(
                             fontSize: 14,
                             color: AppConstants.textSecondaryColor,
@@ -103,44 +104,60 @@ class ProfilePage extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // 数据导入
-            _SectionTitle(title: strings.profileDataManagement),
+            _SectionTitle(title: AppStrings.profileDataManagement.tr(language)),
             _MenuItem(
               icon: Icons.upload_file,
-              title: strings.profileWechatImport,
-              subtitle: strings.profileWechatImportDesc,
+              title: AppStrings.profileWechatImport.tr(language),
+              subtitle: AppStrings.profileWechatImportDesc.tr(language),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                  SnackBar(
+                    content: Text(
+                      AppStrings.profileDevelopingHint.tr(language),
+                    ),
+                  ),
                 );
               },
             ),
             _MenuItem(
               icon: Icons.account_balance,
-              title: strings.profileAlipayImport,
-              subtitle: strings.profileAlipayImportDesc,
+              title: AppStrings.profileAlipayImport.tr(language),
+              subtitle: AppStrings.profileAlipayImportDesc.tr(language),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                  SnackBar(
+                    content: Text(
+                      AppStrings.profileDevelopingHint.tr(language),
+                    ),
+                  ),
                 );
               },
             ),
             _MenuItem(
               icon: Icons.backup,
-              title: strings.profileDataBackup,
-              subtitle: strings.profileDataBackupDesc,
+              title: AppStrings.profileDataBackup.tr(language),
+              subtitle: AppStrings.profileDataBackupDesc.tr(language),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                  SnackBar(
+                    content: Text(
+                      AppStrings.profileDevelopingHint.tr(language),
+                    ),
+                  ),
                 );
               },
             ),
             _MenuItem(
               icon: Icons.restore,
-              title: strings.profileDataRestore,
-              subtitle: strings.profileDataRestoreDesc,
+              title: AppStrings.profileDataRestore.tr(language),
+              subtitle: AppStrings.profileDataRestoreDesc.tr(language),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                  SnackBar(
+                    content: Text(
+                      AppStrings.profileDevelopingHint.tr(language),
+                    ),
+                  ),
                 );
               },
             ),
@@ -148,51 +165,67 @@ class ProfilePage extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // 设置
-            _SectionTitle(title: strings.profileSettings),
+            _SectionTitle(title: AppStrings.profileSettings.tr(language)),
             _MenuItem(
               icon: Icons.category,
-              title: strings.profileCategoryManagement,
-              subtitle: strings.profileCategoryManagementDesc,
+              title: AppStrings.profileCategoryManagement.tr(language),
+              subtitle: AppStrings.profileCategoryManagementDesc.tr(language),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                  SnackBar(
+                    content: Text(
+                      AppStrings.profileDevelopingHint.tr(language),
+                    ),
+                  ),
                 );
               },
             ),
             _MenuItem(
               icon: Icons.notifications,
-              title: strings.profileReminder,
-              subtitle: strings.profileReminderDesc,
+              title: AppStrings.profileReminder.tr(language),
+              subtitle: AppStrings.profileReminderDesc.tr(language),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                  SnackBar(
+                    content: Text(
+                      AppStrings.profileDevelopingHint.tr(language),
+                    ),
+                  ),
                 );
               },
             ),
             _MenuItem(
               icon: Icons.lock,
-              title: strings.profilePrivacy,
-              subtitle: strings.profilePrivacyDesc,
+              title: AppStrings.profilePrivacy.tr(language),
+              subtitle: AppStrings.profilePrivacyDesc.tr(language),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                  SnackBar(
+                    content: Text(
+                      AppStrings.profileDevelopingHint.tr(language),
+                    ),
+                  ),
                 );
               },
             ),
             _MenuItem(
               icon: Icons.palette,
-              title: strings.profileTheme,
-              subtitle: strings.profileThemeDesc,
+              title: AppStrings.profileTheme.tr(language),
+              subtitle: AppStrings.profileThemeDesc.tr(language),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                  SnackBar(
+                    content: Text(
+                      AppStrings.profileDevelopingHint.tr(language),
+                    ),
+                  ),
                 );
               },
             ),
             _MenuItem(
               icon: Icons.language,
-              title: strings.profileLanguage,
-              subtitle: strings.profileLanguageDesc,
+              title: AppStrings.profileLanguage.tr(language),
+              subtitle: AppStrings.profileLanguageDesc.tr(language),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -205,25 +238,31 @@ class ProfilePage extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // 关于
-            _SectionTitle(title: strings.profileAbout),
+            _SectionTitle(title: AppStrings.profileAbout.tr(language)),
             _MenuItem(
               icon: Icons.info,
-              title: strings.profileAboutUs,
+              title: AppStrings.profileAboutUs.tr(language),
               onTap: () {
                 showAboutDialog(
                   context: context,
-                  applicationName: strings.appName,
+                  applicationName: AppStrings.appName.tr(language),
                   applicationVersion: '1.0.0',
-                  applicationLegalese: strings.profileAboutContent,
+                  applicationLegalese: AppStrings.profileAboutContent.tr(
+                    language,
+                  ),
                 );
               },
             ),
             _MenuItem(
               icon: Icons.help,
-              title: strings.profileHelpFeedback,
+              title: AppStrings.profileHelpFeedback.tr(language),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(strings.profileDevelopingHint)),
+                  SnackBar(
+                    content: Text(
+                      AppStrings.profileDevelopingHint.tr(language),
+                    ),
+                  ),
                 );
               },
             ),

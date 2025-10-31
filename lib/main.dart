@@ -3,7 +3,6 @@ import 'src/bindings/bindings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'constants/app_constants.dart';
-import 'constants/app_strings.dart';
 import 'pages/main_frame_page.dart';
 
 Future<void> main() async {
@@ -17,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: AppStringsZh().appName, // 使用默认中文
+      title: '记账', // App title
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(

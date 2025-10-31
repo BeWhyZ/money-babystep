@@ -3,8 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../constants/app_constants.dart';
-import '../models/transaction.dart';
-import '../providers/transaction_provider.dart';
+import '../providers/bill_provider.dart';
 import 'category_selector.dart';
 
 /// 记账输入底部弹窗
@@ -55,35 +54,48 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
     if (!_canSubmit) return;
 
     final amount = double.parse(_amountController.text);
-    final transaction = Transaction(
-      amount: amount,
-      type: _type == TransactionType.expense ? 0 : 1,
-      primaryCategoryId: _selectedPrimaryCategoryId!,
-      secondaryCategoryId: _selectedSecondaryCategoryId,
-      note: _noteController.text.isEmpty ? null : _noteController.text,
-      transactionDate: _selectedDate,
-      createdAt: DateTime.now(),
-    );
 
-    try {
-      await ref.read(transactionProvider.notifier).addTransaction(transaction);
-      if (mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('记账成功')));
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('记账失败: $e')));
-      }
-    }
+    // 使用 Rust API 创建账单
+    // TODO: 从用户会话中获取实际的 userId 和 bookId
+    ref
+        .read(createBillProvider.notifier)
+        .createBill(
+          userId: 1, // 临时硬编码
+          bookId: 1, // 临时硬编码
+          amount: amount,
+          tagIdLv1: _selectedPrimaryCategoryId!,
+          tagIdLv2: _selectedSecondaryCategoryId ?? _selectedPrimaryCategoryId!,
+        );
   }
 
   @override
   Widget build(BuildContext context) {
+    // 监听创建账单的状态变化
+    ref.listen<CreateBillState>(createBillProvider, (previous, next) {
+      if (next.status == CreateBillStatus.success) {
+        // 成功后关闭弹窗并显示提示
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('记账成功'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else if (next.status == CreateBillStatus.error) {
+        // 显示错误提示
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('记账失败: ${next.errorMessage}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
+
+    final createBillState = ref.watch(createBillProvider);
+    final isSubmitting = createBillState.status == CreateBillStatus.loading;
+
     return Container(
       decoration: BoxDecoration(
         color: AppConstants.backgroundColor,
@@ -284,7 +296,7 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: _canSubmit ? _submit : null,
+                  onPressed: (_canSubmit && !isSubmitting) ? _submit : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppConstants.primaryColor,
                     disabledBackgroundColor: AppConstants.dividerColor,
@@ -293,14 +305,25 @@ class _TransactionInputSheetState extends ConsumerState<TransactionInputSheet> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    '完成',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: isSubmitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        )
+                      : const Text(
+                          '完成',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
             ),

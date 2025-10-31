@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/app_constants.dart';
+import '../constants/app_strings.dart';
 import '../providers/locale_provider.dart';
 
 /// 顶部固定栏组件
@@ -11,7 +12,7 @@ class TopBar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final strings = ref.watch(stringsProvider);
+    final language = ref.watch(localeProvider);
     return Container(
       color: AppConstants.cardBackgroundColor,
       child: SafeArea(
@@ -45,7 +46,7 @@ class TopBar extends ConsumerWidget implements PreferredSizeWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        strings.navProfile,
+                        AppStrings.navProfile.tr(language),
                         style: TextStyle(
                           fontSize: 14,
                           color: AppConstants.textPrimaryColor,
@@ -58,7 +59,7 @@ class TopBar extends ConsumerWidget implements PreferredSizeWidget {
 
               // 中间APP名称
               Text(
-                strings.appName,
+                AppStrings.appName.tr(language),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,

@@ -1,3 +1,6 @@
+mod demo;
+pub use demo::demo_ffi_f2r;
+
 use rinf::{DartSignal, RustSignal, SignalPiece};
 use serde::{Deserialize, Serialize};
 

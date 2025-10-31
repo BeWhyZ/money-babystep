@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/app_constants.dart';
+import '../constants/app_strings.dart';
 import '../providers/locale_provider.dart';
 
 /// 语言设置页面
@@ -9,13 +10,12 @@ class LanguageSettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentLocale = ref.watch(localeProvider);
-    final strings = ref.watch(stringsProvider);
+    final language = ref.watch(localeProvider);
 
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
       appBar: AppBar(
-        title: Text(strings.profileLanguage),
+        title: Text(AppStrings.profileLanguage.tr(language)),
         backgroundColor: AppConstants.cardBackgroundColor,
         elevation: 0,
       ),
@@ -25,18 +25,18 @@ class LanguageSettingsPage extends ConsumerWidget {
           _LanguageItem(
             title: '简体中文',
             subtitle: 'Simplified Chinese',
-            isSelected: currentLocale == AppLocale.zh,
+            isSelected: language == Language.zh,
             onTap: () {
-              ref.read(localeProvider.notifier).state = AppLocale.zh;
+              ref.read(localeProvider.notifier).state = Language.zh;
             },
           ),
           const SizedBox(height: 12),
           _LanguageItem(
             title: 'English',
             subtitle: 'English',
-            isSelected: currentLocale == AppLocale.en,
+            isSelected: language == Language.en,
             onTap: () {
-              ref.read(localeProvider.notifier).state = AppLocale.en;
+              ref.read(localeProvider.notifier).state = Language.en;
             },
           ),
         ],
