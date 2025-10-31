@@ -1,84 +1,51 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/transaction.dart';
-import '../services/database_service.dart';
+import '../src/bindings/signals/signals.dart';
+import 'bill_provider.dart';
 
-/// 交易记录列表提供者
-class TransactionNotifier extends StateNotifier<AsyncValue<List<Transaction>>> {
-  TransactionNotifier() : super(const AsyncValue.loading()) {
-    loadTransactions();
-  }
-
-  final _dbService = DatabaseService();
-
-  /// 加载所有交易记录
-  Future<void> loadTransactions() async {
-    state = const AsyncValue.loading();
-    try {
-      final transactions = await _dbService.getAllTransactions();
-      state = AsyncValue.data(List<Transaction>.from(transactions));
-    } catch (e, stack) {
-      state = AsyncValue.error(e, stack);
-    }
-  }
-
-  /// 添加交易记录
-  Future<void> addTransaction(Transaction transaction) async {
-    try {
-      await _dbService.insertTransaction(transaction);
-      await loadTransactions();
-    } catch (e) {
-      // TODO: 错误处理
-      rethrow;
-    }
-  }
-
-  /// 更新交易记录
-  Future<void> updateTransaction(Transaction transaction) async {
-    try {
-      await _dbService.updateTransaction(transaction);
-      await loadTransactions();
-    } catch (e) {
-      // TODO: 错误处理
-      rethrow;
-    }
-  }
-
-  /// 删除交易记录
-  Future<void> deleteTransaction(int id) async {
-    try {
-      await _dbService.deleteTransaction(id);
-      await loadTransactions();
-    } catch (e) {
-      // TODO: 错误处理
-      rethrow;
-    }
-  }
-
-  /// 根据日期范围加载交易记录
-  Future<void> loadTransactionsByDateRange(
-    DateTime startDate,
-    DateTime endDate,
-  ) async {
-    state = const AsyncValue.loading();
-    try {
-      final transactions = await _dbService.getTransactionsByDateRange(
-        startDate,
-        endDate,
-      );
-      state = AsyncValue.data(List<Transaction>.from(transactions));
-    } catch (e, stack) {
-      state = AsyncValue.error(e, stack);
-    }
-  }
+/// 将 Bill (Rust) 转换为 Transaction (UI 模型)
+Transaction _billToTransaction(Bill bill) {
+  return Transaction(
+    id: bill.id.toInt(),
+    amount: bill.amount,
+    type: 0, // TODO: 根据 tagIdLv1 判断是支出(0)还是收入(1)
+    primaryCategoryId: bill.tagIdLv1.toInt(),
+    secondaryCategoryId: bill.tagIdLv2.toInt(),
+    note: null, // Bill 暂时没有 note 字段
+    transactionDate: DateTime.fromMillisecondsSinceEpoch(
+      bill.createAtSec.toInt() * 1000,
+    ),
+    createdAt: DateTime.fromMillisecondsSinceEpoch(
+      bill.createAtSec.toInt() * 1000,
+    ),
+    updatedAt: DateTime.fromMillisecondsSinceEpoch(
+      bill.updateAtSec.toInt() * 1000,
+    ),
+  );
 }
 
-/// 交易记录提供者
-final transactionProvider =
-    StateNotifierProvider<TransactionNotifier, AsyncValue<List<Transaction>>>((
-      ref,
-    ) {
-      return TransactionNotifier();
-    });
+/// 交易记录提供者（基于新的 billListProvider）
+final transactionProvider = Provider<AsyncValue<List<Transaction>>>((ref) {
+  final billsAsync = ref.watch(billListProvider);
+
+  return billsAsync.when(
+    data: (bills) {
+      // 将 Bill 列表转换为 Transaction 列表
+      final transactions = bills
+          .map((bill) => _billToTransaction(bill))
+          .toList();
+
+      // 按日期倒序排列（最新的在前面）
+      transactions.sort(
+        (a, b) => b.transactionDate.compareTo(a.transactionDate),
+      );
+
+      return AsyncValue.data(transactions);
+    },
+    loading: () => const AsyncValue.loading(),
+    error: (error, stack) => AsyncValue.error(error, stack),
+  );
+});
 
 /// 月度收入统计提供者
 final monthlyIncomeProvider = Provider<double>((ref) {

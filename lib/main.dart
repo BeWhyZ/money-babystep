@@ -4,17 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'constants/app_constants.dart';
 import 'pages/main_frame_page.dart';
+import 'services/rust_signal_service.dart';
 
 Future<void> main() async {
   await initializeRust(assignRustSignal);
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 初始化全局 Rust 信号监听服务
+    ref.read(rustSignalServiceProvider);
+
     return MaterialApp(
       title: '记账', // App title
       debugShowCheckedModeBanner: false,

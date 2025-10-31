@@ -45,22 +45,9 @@ class CreateBillState {
 
 /// 创建账单的 Provider
 class CreateBillNotifier extends StateNotifier<CreateBillState> {
-  CreateBillNotifier() : super(const CreateBillState.initial()) {
-    _listenToRustSignals();
-  }
+  final Ref ref;
 
-  /// 监听来自 Rust 的响应
-  void _listenToRustSignals() {
-    CreateBillResp.rustSignalStream.listen(
-      (signalPack) {
-        final bill = signalPack.message.bill;
-        state = CreateBillState.success(bill);
-      },
-      onError: (error) {
-        state = CreateBillState.error(error.toString());
-      },
-    );
-  }
+  CreateBillNotifier(this.ref) : super(const CreateBillState.initial());
 
   /// 创建账单
   Future<void> createBill({
@@ -88,6 +75,18 @@ class CreateBillNotifier extends StateNotifier<CreateBillState> {
     }
   }
 
+  /// 处理来自 Rust 的响应（由全局监听器调用）
+  void handleResponse(Bill bill) {
+    state = CreateBillState.success(bill);
+    // 同时添加账单到列表 provider
+    ref.read(billListProvider.notifier).addBill(bill);
+  }
+
+  /// 处理错误
+  void handleError(String errorMessage) {
+    state = CreateBillState.error(errorMessage);
+  }
+
   /// 重置状态
   void reset() {
     state = const CreateBillState.initial();
@@ -97,12 +96,15 @@ class CreateBillNotifier extends StateNotifier<CreateBillState> {
 /// 创建账单的 Provider 实例
 final createBillProvider =
     StateNotifierProvider<CreateBillNotifier, CreateBillState>(
-      (ref) => CreateBillNotifier(),
+      (ref) => CreateBillNotifier(ref),
     );
 
 /// 账单列表 Provider（用于展示所有账单）
 class BillListNotifier extends StateNotifier<AsyncValue<List<Bill>>> {
-  BillListNotifier() : super(const AsyncValue.loading());
+  BillListNotifier() : super(const AsyncValue.data([])) {
+    // 初始化为空列表，未来可以在这里加载历史数据
+    // loadBills();
+  }
 
   // TODO: 实现从 Rust 获取账单列表的逻辑
   Future<void> loadBills() async {
@@ -119,7 +121,8 @@ class BillListNotifier extends StateNotifier<AsyncValue<List<Bill>>> {
   /// 添加账单到本地列表
   void addBill(Bill bill) {
     state.whenData((bills) {
-      final updatedBills = [...bills, bill];
+      // 将新账单添加到列表开头（最新的在前面）
+      final updatedBills = [bill, ...bills];
       state = AsyncValue.data(updatedBills);
     });
   }
