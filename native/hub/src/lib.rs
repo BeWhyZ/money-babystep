@@ -4,6 +4,7 @@
 mod actors;
 mod api;
 mod biz;
+mod core;
 mod data;
 mod server;
 mod service;
@@ -32,7 +33,7 @@ static APP_SERVER: OnceCell<Arc<BillSvc<BillRepoImpl, TagRepoImpl>>> = OnceCell:
 // You can go with any async library, not just `tokio`.
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
-    let srv = Arc::new(init_app());
+    let srv = Arc::new(init_app().await);
     APP_SERVER
         .set(srv.clone())
         .expect("Failed to set app server");

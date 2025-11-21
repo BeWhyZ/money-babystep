@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{error, info};
 
 use crate::api;
-use crate::biz::{Bill, BillBiz, BillRepo, TagRepo};
+use crate::biz::{Bill, BillBiz, BillRepo, TagRepo, TransactionType};
 
 #[derive(Debug, Clone)]
 pub struct BillSvc<B, T>
@@ -20,6 +20,8 @@ where
 pub struct CreateBillReq {
     pub user_id: u64,
     pub book_id: u64,
+    pub transaction_type: TransactionType,
+    pub note: Option<String>,
     pub amount: f64,
     pub tag_id_lv1: u64,
     pub tag_id_lv2: u64,
@@ -50,6 +52,8 @@ where
                 .create_bill(
                     req.user_id,
                     req.book_id,
+                    req.transaction_type,
+                    req.note,
                     req.amount,
                     req.tag_id_lv1,
                     req.tag_id_lv2,

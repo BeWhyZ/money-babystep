@@ -4,6 +4,12 @@ use chrono::Utc;
 use rinf::SignalPiece;
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, Serialize, SignalPiece, Deserialize)]
+pub(crate) enum TransactionType {
+    Expense(u64),
+    Income(u64),
+}
+
 use crate::Result;
 // 业务逻辑一个账本相关的业务逻辑
 // 用户默认使用的是默认账本, 所有的账本相关的操作, 都是针对默认账本进行的
@@ -23,11 +29,15 @@ where
 #[derive(Debug, Clone, Serialize, SignalPiece, Deserialize)]
 pub struct Bill {
     pub id: u64,
+    pub transaction_id: u64,
+    pub transaction_type: TransactionType,
     pub user_id: u64,
     pub book_id: u64,
     pub amount: f64,
     pub tag_id_lv1: u64,
     pub tag_id_lv2: u64,
+    pub note: Option<String>,
+    pub date: String,
     pub create_at_sec: i64,
     pub update_at_sec: i64,
 }
@@ -90,20 +100,26 @@ where
         &self,
         user_id: u64,
         book_id: u64,
+        transaction_type: TransactionType,
+        note: Option<String>,
         amount: f64,
         tag_id_lv1: u64,
         tag_id_lv2: u64,
     ) -> Result<Bill> {
-        let now = Utc::now().timestamp();
+        let now = Utc::now();
         let mut bill = Bill {
             id: 0,
+            transaction_id: 0,
             user_id,
             book_id,
+            transaction_type,
+            note,
+            date: now.format("%Y-%m-%d").to_string(),
             amount,
             tag_id_lv1,
             tag_id_lv2,
-            create_at_sec: now,
-            update_at_sec: now,
+            create_at_sec: now.timestamp(),
+            update_at_sec: now.timestamp(),
         };
         self.br.create(&mut bill).await?;
         Ok(bill)

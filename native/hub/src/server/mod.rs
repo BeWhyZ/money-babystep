@@ -1,12 +1,15 @@
 use std::sync::Arc;
 
 use crate::biz::BillBiz;
-use crate::data::{BillRepoImpl, Infra, TagRepoImpl};
+use crate::core::{IDGenerator, IdGeneratorConfig};
+use crate::data::{self, BillRepoImpl, Infra, TagRepoImpl};
 use crate::service::BillSvc;
 
-pub fn init_app() -> BillSvc<BillRepoImpl, TagRepoImpl> {
+pub async fn init_app() -> BillSvc<BillRepoImpl, TagRepoImpl> {
     // data
-    let infra = std::sync::Arc::new(Infra::new());
+    let id_generator = Arc::new(IDGenerator::new(IdGeneratorConfig::default()).unwrap());
+    let db = data::init_db_engine("sqlite://money_babystep.db".to_string()).await;
+    let infra = Infra::new(db, id_generator.clone());
     let tag_repo = std::sync::Arc::new(TagRepoImpl::new(infra.clone()));
     let bill_repo = std::sync::Arc::new(BillRepoImpl::new(infra.clone()));
 
