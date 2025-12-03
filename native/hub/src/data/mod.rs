@@ -5,31 +5,67 @@ pub use repo::*;
 
 use std::sync::Arc;
 
+use crate::Result;
 use crate::core::IDGenerator;
-use sqlx::sqlite::SqlitePool;
-use tracing::{error, info};
+use sea_orm::{ConnectOptions, Database, DatabaseConnection, DbErr};
+use sqlx::{Connection, SqliteConnection, SqlitePool, sqlite::SqliteConnectOptions};
+use std::str::FromStr;
+use std::time::Duration;
+use tracing::{error, info, log};
 
-pub async fn init_db_engine(db_addr: String) -> SqlitePool {
-    let pool = match SqlitePool::connect(&db_addr).await {
-        Ok(p) => p,
-        Err(e) => {
-            error!("Failed to connect to the database: {}", e);
-            panic!("Database connection error");
-        }
-    };
+pub async fn init_db_engine(db_addr: String) -> DatabaseConnection {
+    let mut opt = ConnectOptions::new(db_addr.clone());
+    opt.max_connections(100)
+        .min_connections(5)
+        .connect_timeout(Duration::from_secs(8))
+        .acquire_timeout(Duration::from_secs(8))
+        .idle_timeout(Duration::from_secs(8))
+        .max_lifetime(Duration::from_secs(8))
+        // .sqlx_logging(false) // disable SQLx logging
+        .sqlx_logging_level(log::LevelFilter::Info);
+    let db = Database::connect(opt).await.unwrap();
 
+    assert!(db.ping().await.is_ok());
+    db.clone().close().await;
+    assert!(matches!(db.ping().await, Err(DbErr::ConnectionAcquire(_))));
     info!("Connected to the database at {}", db_addr);
 
-    // Here you can run migrations or any initialization SQL if needed.
-    match sqlx::migrate!("./migrations").run(&pool).await {
-        Ok(_) => info!("Database migrations applied successfully"),
-        Err(e) => {
-            error!("Failed to apply database migrations: {}", e);
-            panic!("Database migration error");
-        }
-    };
+    // Run migrations using sqlx
+    if let Err(e) = run_migrations_by_sqlx(db_addr.clone()).await {
+        error!("Failed to apply database migrations: {}", e);
+        panic!("Database migration error: {}", e);
+    }
 
-    pool
+    db
+}
+
+async fn run_migrations_by_sqlx(addr: String) -> Result<()> {
+    // Parse the database URL to extract the file path
+    // Format: sqlite://money_babystep.db.sqlite?mode=rwc
+    let db_path = addr
+        .strip_prefix("sqlite://")
+        .and_then(|s| s.split('?').next())
+        .ok_or_else(|| anyhow::anyhow!("Invalid database URL format"))?;
+
+    // Create SQLite connection options
+    let options = SqliteConnectOptions::from_str(&format!("sqlite://{}?mode=rwc", db_path))?
+        .create_if_missing(true);
+
+    // Connect to the database
+    let mut conn: SqliteConnection = SqliteConnection::connect_with(&options).await?;
+
+    // Run migrations
+    sqlx::migrate!("./migrations")
+        .run(&mut conn)
+        .await
+        .map_err(|e| {
+            error!("Failed to apply database migrations: {}", e);
+            anyhow::anyhow!("Database migration error: {}", e)
+        })?;
+
+    info!("Database migrations applied successfully");
+    conn.close().await?;
+    Ok(())
 }
 
 #[derive(Debug, Clone)]

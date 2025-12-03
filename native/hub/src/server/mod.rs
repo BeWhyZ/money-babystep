@@ -8,7 +8,7 @@ use crate::service::BillSvc;
 pub async fn init_app() -> BillSvc<BillRepoImpl, TagRepoImpl> {
     // data
     let id_generator = Arc::new(IDGenerator::new(IdGeneratorConfig::default()).unwrap());
-    let db = data::init_db_engine("sqlite://money_babystep.db".to_string()).await;
+    let db = data::init_db_engine("sqlite://money_babystep.db.sqlite?mode=rwc".to_string()).await;
     let infra = Infra::new(db, id_generator.clone());
     let tag_repo = std::sync::Arc::new(TagRepoImpl::new(infra.clone()));
     let bill_repo = std::sync::Arc::new(BillRepoImpl::new(infra.clone()));
